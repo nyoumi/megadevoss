@@ -1,7 +1,7 @@
 <template>
   <ion-app>
     <ion-split-pane content-id="main-content">
-      <ion-menu content-id="main-content" type="overlay" mode="ios">
+   <!--    <ion-menu content-id="main-content" type="overlay" mode="ios">
         <ion-content>
           <ion-list id="inbox-list">
                         
@@ -44,15 +44,14 @@
                 
           
         </ion-content>
-      </ion-menu>
+      </ion-menu> -->
       <ion-router-outlet id="main-content"></ion-router-outlet>
     </ion-split-pane>
   </ion-app>
 </template>
 
 <script lang="ts">
-import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList,loadingController ,
- IonListHeader, IonMenu, IonMenuToggle, IonRouterOutlet, IonSplitPane, onIonViewDidEnter } from '@ionic/vue';
+import { IonApp,loadingController , IonRouterOutlet, IonSplitPane, onIonViewDidEnter } from '@ionic/vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { gridOutline,gridSharp,refreshCircleOutline,fastFoodOutline } from 'ionicons/icons';
@@ -63,15 +62,7 @@ import { Storage } from '@capacitor/storage';
 export default defineComponent({
   name: 'App',
   components: {
-    IonApp, 
-    IonContent, 
-    IonIcon, 
-    IonItem, 
-    IonLabel, 
-    IonList, 
-    IonListHeader, 
-    IonMenu, 
-    IonMenuToggle, 
+    IonApp,  
     IonRouterOutlet, 
     IonSplitPane,
   },
@@ -79,10 +70,7 @@ export default defineComponent({
     
     const selectedIndex = ref(0);
     let categories=ref();
-    onIonViewDidEnter(() => {
-      console.log('ionViewDidEnter!');
-    });
-
+    
     categories.value = [
      
       {
