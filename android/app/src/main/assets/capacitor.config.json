@@ -1,0 +1,6 @@
+{
+	"appId": "app.mega.com",
+	"appName": "megadevoss",
+	"webDir": "dist",
+	"bundledWebRuntime": false
+}
