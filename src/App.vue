@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { IonApp,loadingController , IonRouterOutlet, IonSplitPane, onIonViewDidEnter } from '@ionic/vue';
+import { IonApp,loadingController , IonRouterOutlet, IonSplitPane, IonicVue } from '@ionic/vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { gridOutline,gridSharp,refreshCircleOutline,fastFoodOutline } from 'ionicons/icons';
@@ -70,49 +70,13 @@ export default defineComponent({
     
     const selectedIndex = ref(0);
     let categories=ref();
-    
+
     categories.value = [
      
       {
         category_name: 'African Dishes',
         url: '/folder/Outbox',
         cat_id: 2,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Salads',
-        url: '/folder/Favorites',
-        cat_id: 3,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Burger/Pizza/Sandwiche',
-        url: '/folder/Archived',
-        cat_id: 4,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Desserts',
-        url: '/folder/Trash',
-        cat_id: 5,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Breakfast',
-        url: '/folder/Spam',
-        cat_id: 6,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Coffee',
-        url: '/folder/Trash',
-        cat_id: 7,
-        mdIcon: fastFoodOutline
-      },
-      {
-        category_name: 'Breakfast',
-        url: '/folder/Spam',
-        cat_id: 8,
         mdIcon: fastFoodOutline
       }
     ];

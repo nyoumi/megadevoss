@@ -23,7 +23,18 @@
                 <ion-label class="links_name menuinvisible"  v-bind:class="{ menuvisible: isActive }" >{{ p.category_name }}</ion-label>
                 </a>
         </li>
-       
+        <li @click="makeRefresh">
+          <a >
+            <ion-icon slot="start" :md="refreshCircleOutline" :ios="refreshCircleOutline" color="primary" class="bx bx-box"></ion-icon>
+            <span class="links_name menuinvisible" v-bind:class="{ menuvisible: isActive }">Refresh</span>
+          </a>
+        </li> 
+        <li @click="openAdmin">
+          <a>
+            <ion-icon slot="start" :md="personCircleOutline" :ios="personCircleOutline" color="primary" class="bx bx-box"></ion-icon>
+            <span class="links_name menuinvisible" v-bind:class="{ menuvisible: isActive }">Admin</span>
+          </a>
+        </li>       
       </ul>
   </div>
     <ion-header :translucent="true">
@@ -32,22 +43,20 @@
           <ion-button color="primary" slot="start" @click="openMenu()"><ion-icon :ios="menu" :md="menu"></ion-icon></ion-button>
         </ion-buttons>
         <ion-searchbar placeholder="Search..." showCancelButton="never" @ionChange="filterItems($event)"></ion-searchbar>
-                <ion-buttons slot="end">
-                  <ion-avatar>
-                      <img src="assets/images/me.jpg">
-                  </ion-avatar>
-                </ion-buttons>
-
-
+          <ion-buttons slot="end">
+            <ion-avatar>
+              <img src="assets/images/me.jpg">
+            </ion-avatar>
+          </ion-buttons>
         <!-- <ion-title>{{ $route.params.id }}</ion-title> -->
       </ion-toolbar>
     </ion-header>
     
     <ion-content :fullscreen="true">
         <ion-backdrop v-bind:class="{ menuinvisible: !isActive }"
-    :tappable="!isActive"
+    :tappable="isActive"
     :visible="!isActive"
-    :stop-propagation="shouldPropagate" @ionBackdropTap="openMenu()">
+     @ionBackdropTap="openMenu()">
   </ion-backdrop>
       
       <div class="meals">
@@ -71,10 +80,13 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IonButtons, IonContent, IonHeader,IonIcon, IonPage,IonButton, IonToolbar,IonSearchbar,IonBadge,IonCard,IonAvatar,IonImg, onIonViewWillEnter } from '@ionic/vue';
+import { IonButtons, IonContent, IonHeader,IonIcon,loadingController,IonBackdrop, IonPage,IonButton, IonToolbar,IonSearchbar,IonBadge,IonCard,IonAvatar,IonImg, onIonViewWillEnter } from '@ionic/vue';
 import { useRouter,useRoute } from 'vue-router';
 import { Storage } from '@capacitor/storage';
-import { fastFood,gridSharp,menu } from 'ionicons/icons';
+import { fastFood,gridSharp,menu,refreshCircleOutline,personCircleOutline } from 'ionicons/icons';
+import { Http } from '@capacitor-community/http';
+import { Browser } from '@capacitor/browser';
+
 
 export default defineComponent({
   name: 'FolderPage',
@@ -84,6 +96,7 @@ export default defineComponent({
     IonHeader,
     IonButton,
     IonPage,
+    IonBackdrop,
     IonIcon,
     IonToolbar,
     IonSearchbar,IonBadge,IonCard,IonAvatar,
@@ -95,21 +108,15 @@ export default defineComponent({
       const route = useRoute();
       const { id } = route.params;
       const isActive= ref();
-      isActive.value=false;
+      isActive.value=true;
       console.log(id)
 
       let categories=ref();
-
-
-
 
     onIonViewWillEnter(async() => {
        const { value } = await Storage.get({ key: 'meals' })
        
          if(value!=null) {
-           
-           
-
            let datas=JSON.parse(value);
            let temp:any=[]
            datas.forEach((element:string) => {
@@ -130,9 +137,6 @@ export default defineComponent({
        const { value } = await Storage.get({ key: 'categories' })
        
          if(value!=null) {
-           
-           
-
            let datas=JSON.parse(value);
            let temp:any=[]
            datas.forEach((element:string) => {
@@ -152,7 +156,8 @@ export default defineComponent({
       allMeals,
       categories,
       fastFood,
-      gridSharp,
+      gridSharp,refreshCircleOutline,
+      personCircleOutline,
       isActive,
       menu
     }
@@ -161,7 +166,6 @@ export default defineComponent({
   methods: {
     filterItems(searchTerm:any):any {
       this.meals=this.allMeals
-
       let searchValue:string=searchTerm.detail.value
       if (searchValue.length==0) {
         return
@@ -174,8 +178,94 @@ export default defineComponent({
   openMenu(){
     this.isActive= (!this.isActive)
     console.log(this.isActive)
+  },
+       async makeRefresh()  {   
+       this.presentLoading()
+      await this.refreshMeals()
+      await this.refreshCategories()
+      loadingController.dismiss()
+      },
+       async presentLoading() {
+       const loading = await loadingController
+        .create({
+          cssClass: 'my-custom-class',
+          message: 'Loading...',
+          mode:"ios",
+          backdropDismiss:true
+        });
+        
+        
+      await loading.present();
+      
+    },
+    async refreshMeals(){
+             const options = {
+    url: 'https://app.megadevoss.com/api.php/foods',
+    //headers: { 'X-Fake-Header': 'Max was here' },
+    //params: { size: 'XL' },
+  };
+
+
+  const response = await Http.request({ ...options, method: 'GET' }) 
+  if(response.status==200){
+    let JsonData=JSON.parse(response.data)
+    this.saveData(JsonData,'meals');
+    this.meals=[]
+    JsonData.forEach((element:string) => {
+      let food=JSON.parse(element);
+    if (food.food_id!=null) {
+        console.log(food.food_img)
+        this.meals.push(food)
+        //this.downloadImg(food.food_img)
+    }
+    
+  });
+
   }
+  console.log(JSON.parse(response.data))  
+  console.log("refreshing")
+    },
+        async refreshCategories(){
+             const options = {
+    url: 'https://app.megadevoss.com/api.php/categories',
+    //headers: { 'X-Fake-Header': 'Max was here' },
+    //params: { size: 'XL' },
+  };
+
+
+  const response = await Http.request({ ...options, method: 'GET' }) 
+  if(response.status==200){
+    let JsonData=JSON.parse(response.data)
+    this.saveData(JsonData,'categories');
+    this.categories=[]
+    JsonData.forEach((element:string) => {
+      let cat=JSON.parse(element);
+    if (cat.cat_id!=null) {
+        console.log(cat.category_name)
+        this.categories.push(cat)        //this.downloadImg(food.food_img)
+    }
+    
+  });
+
   }
+  console.log(JSON.parse(response.data))  
+  console.log("refreshing")
+    },
+    
+  async saveData(datas:any,key:string){
+    console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    console.log(datas)
+    await Storage.set({
+    key: key,
+    value: JSON.stringify(datas)
+  });
+
+      },
+      async openAdmin() {
+        await Browser.open({ url: 'https://app.megadevoss.com/' });
+      },
+    }
+  
   
 });
 </script>
@@ -213,7 +303,7 @@ ion-badge {
     margin-top: 2%;
 }
 ion-card {
-margin-left: 2%;
+    margin-left: 2%;
     /* padding-left: 10px; */
     margin-right: 2%;
     display: inline-flex;
@@ -359,11 +449,12 @@ ion-header{
 .sidebar {
   position: fixed;
   height: 100%;
-  width: 240px;
+  width: 60px;
   z-index: 10000;
   background: #141414;
   transition: all 0.5s ease;
   border-right: 3px solid rgb(58, 58, 58);
+  overflow-y:auto;
 }
 
 .sidebar.active {
@@ -429,6 +520,7 @@ ion-header{
   font-size: 15px;
   font-weight: 400;
   white-space: nowrap;
+  margin-left: 20px;
 }
 
 .sidebar .nav-links .log_out {

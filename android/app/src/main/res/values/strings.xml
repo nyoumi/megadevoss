@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">megadevoss</string>
+    <string name="app_name">Megadevoss</string>
     <string name="title_activity_main">megadevoss</string>
     <string name="package_name">app.mega.com</string>
     <string name="custom_url_scheme">app.mega.com</string>

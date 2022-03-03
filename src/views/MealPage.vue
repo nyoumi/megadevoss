@@ -21,11 +21,11 @@
             
           <ion-img :src="'https://template.megadevoss.com/vendors/images/uploads/'+meal.food_img"></ion-img>
           <ion-badge>{{meal.food_price}} Frs</ion-badge>
-          <span class="meal-title">{{meal.food_name}} </span>
+          <ion-card-title>{{meal.food_name}}</ion-card-title>
+
           <ion-card-content>{{meal.food_description}}</ion-card-content>
       </ion-card>
       </div>
-
     </ion-content>
   </ion-page>
 </template>
@@ -83,6 +83,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
+ion-card-content{
+  font-size: 16px;
+}
 span.meal-title {
     position: absolute;
     top: 2%;
